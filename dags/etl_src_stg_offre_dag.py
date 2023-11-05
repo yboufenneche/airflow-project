@@ -20,13 +20,7 @@ DB_CONNECTION = 'postgres_dev'  # Connextion to the DB
 SOURCE_TABLE = 'src_offre'  # Source table to storing input data
 TARGET_TABLE = 'stg_offre'  # Target table to store data trasformed
 
-# Source CSV file
-INPUT_FILE = "/data/src_data/src_direction.csv"  # File name
-CSV_SEPARATOR = ";"  # Separator in the CSV file
-
 # The dag
-
-
 @dag(
     schedule_interval="0 0 * * *",  # Déclencher à minuit chaque jour
     start_date=datetime(2023, 1, 1),
