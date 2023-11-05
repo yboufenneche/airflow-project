@@ -1,0 +1,7 @@
+Id_Distance;Lib_Distance;Desc_Distance
+1;GMS Local;Appel entre portables sur le reseau Orange
+2;Autre GMS;Appel entre portables sur un autre reseau GMS
+3;Local;Appel fixe/portable sur le reseau local
+4;National;Appel fixe/portable sur le reseau national
+5;International;Appel fixe/portable en international
+-1;Error; 

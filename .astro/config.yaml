@@ -1,0 +1,4 @@
+project:
+  name: tp-bi
+postgres:
+  port: 5435

@@ -1,0 +1,5 @@
+Id_Produit;Lib_Produit;Desc_Produit
+1;Voix;Appel vocal
+2;SMS;Message SMS
+3;FAX;Envoi vers fax
+0;Unknown;???
