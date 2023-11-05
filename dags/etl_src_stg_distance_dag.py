@@ -31,7 +31,7 @@ CSV_SEPARATOR = ";"  # Separator in the CSV file
     tags=["example"],
 )
 def etl_src_stg_distance_dag():
-    # Function to read a CSV file
+    # Task taht reads a CSV file
     # Set null values for Desc_distance to "Non renseigné"
     @task
     def read_csv_task(file_path, id, lib, sep=CSV_SEPARATOR):
@@ -47,7 +47,7 @@ def etl_src_stg_distance_dag():
     csv_to_df_task = read_csv_task(
         csv_file_path, 'Id_Distance', 'Lib_Distance')
 
-    # Show the data read from CSV
+    # Copy transformed data to SQL table
     @task
     def copy_df_to_sql(dataframe):
         conn_string = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
