@@ -62,14 +62,7 @@ def etl_src_stg_distance_dag():
     create_sql_table_task = PostgresOperator(
         task_id='create_postgres_table',
         postgres_conn_id=DB_CONNECTION,
-        sql=f"""
-            CREATE TABLE IF NOT EXISTS {TARGET_TABLE} (
-            Id_Distance INT,
-            Lib_Distance VARCHAR(50),
-            Desc_Distance VARCHAR(50),
-            CONSTRAINT SRC_REFDISTANCE_PK PRIMARY KEY (Id_Distance)
-            );
-        """
+        sql="sql/stg_distance_schema.sql"
     )
 
     # Truncate SQL table

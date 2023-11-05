@@ -62,13 +62,7 @@ def etl_src_stg_direction_dag():
     create_sql_table_task = PostgresOperator(
         task_id='create_postgres_table',
         postgres_conn_id=DB_CONNECTION,
-        sql=f"""
-            CREATE TABLE IF NOT EXISTS {TARGET_TABLE} (
-                Id_Direction NUMERIC(1),
-                Lib_Direction VARCHAR(15),
-                PRIMARY KEY (Id_Direction)
-            );
-        """
+        sql="sql/stg_offre_schema.sql"
     )
 
     # Truncate SQL table
