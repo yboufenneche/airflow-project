@@ -2,8 +2,10 @@ from datetime import datetime, timedelta
 from airflow.decorators import dag, task
 from airflow import DAG
 from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.operators.python_operator import PythonOperator
 import pandas as pd
 import os
+from sqlalchemy import create_engine
 
 DB_CONNECTION = 'postgres_dev'
 # Source csv filename
@@ -36,18 +38,20 @@ def etl_src_stg_distance_dag():
 
     # Read the CSV file using the previous function
     csv_file_path = os.path.dirname(__file__) + INPUT_FILE
-    df_task = read_csv_task(csv_file_path, 'Id_Distance', 'Lib_Distance')
+    csv_to_df_task = read_csv_task(csv_file_path, 'Id_Distance', 'Lib_Distance')
 
     # Show the data read from CSV
     @task
-    def print_dataframe(dataframe):
-        print(dataframe)
+    def copy_df_to_sql(dataframe):
+        conn_string = 'postgresql://postgres:postgres@host.docker.internal:5435/stg'
+        engine = create_engine(conn_string)
+        dataframe.to_sql(TARGET_TABLE, engine, if_exists='replace', index=False)
 
-    # Utiliser la tâche pour afficher les données
-    print_task = print_dataframe(df_task)
+    # Create variable to store the task
+    load_stg_distance = copy_df_to_sql (csv_to_df_task)
 
     # Create the SQL table
-    create_t_task = PostgresOperator(
+    create_sql_table_task = PostgresOperator(
         task_id='create_postgres_table',
         postgres_conn_id=DB_CONNECTION,
         sql=f"""
@@ -60,18 +64,8 @@ def etl_src_stg_distance_dag():
         """
     )
 
-    # Insert data into SQL table
-    insert_t_task = PostgresOperator(
-        task_id='insert_into_table',
-        postgres_conn_id=DB_CONNECTION,
-        sql=f"""
-            INSERT INTO {TARGET_TABLE} (Id_Distance, Lib_Distance, Desc_Distance)
-            VALUES (1, 'GMS Local', 'Appel entre portables sur le réseau Orange');
-        """
-    )
-
     # Truncate SQL table
-    truncate_t_task = PostgresOperator(
+    truncate_sql_table_task = PostgresOperator(
         task_id='delete_data_from_table',
         postgres_conn_id=DB_CONNECTION,
         sql=f"""
@@ -80,7 +74,7 @@ def etl_src_stg_distance_dag():
     )
 
     # Tasks order
-    df_task >> print_task >> create_t_task >> truncate_t_task >> insert_t_task
+    csv_to_df_task >> create_sql_table_task >> truncate_sql_table_task >> load_stg_distance
 
 # Create the DAG object
 stg_distance = etl_src_stg_distance_dag()
