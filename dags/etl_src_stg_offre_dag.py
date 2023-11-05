@@ -15,6 +15,7 @@ DB_USER = "postgres"
 DB_PASS = "postgres"
 conn_string = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(conn_string)
+
 # For PostgresOperator
 DB_CONNECTION = 'postgres_dev'  # Connextion to the DB
 SOURCE_TABLE = 'src_offre'  # Source table to storing input data

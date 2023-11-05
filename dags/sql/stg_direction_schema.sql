@@ -3,3 +3,5 @@ CREATE TABLE IF NOT EXISTS stg_direction (
     Lib_Direction VARCHAR(15),
     PRIMARY KEY (Id_Direction)
 );
+
+TRUNCATE TABLE stg_direction;

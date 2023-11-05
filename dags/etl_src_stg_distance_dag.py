@@ -6,20 +6,23 @@ from airflow.operators.python_operator import PythonOperator
 import pandas as pd
 import os
 from sqlalchemy import create_engine
+
 # For the function: copy_df_to_sql(dataframe)
 DB_HOST = "host.docker.internal"
 DB_NAME = "stg"
 DB_PORT = "5435"
 DB_USER = "postgres"
 DB_PASS = "postgres"
+
 # For PostgresOperator
 DB_CONNECTION = 'postgres_dev'  # Connextion to the DB
 TARGET_TABLE = 'stg_distance'  # Target table to store data trasformed
+
 # Source CSV file
 INPUT_FILE = "/data/src_data/src_distance.csv"  # File name
 CSV_SEPARATOR = ";"  # Separator in the CSV file
 
-
+# The dag
 @dag(
     schedule_interval="0 0 * * *",  # Déclencher à minuit chaque jour
     start_date=datetime(2023, 1, 1),
