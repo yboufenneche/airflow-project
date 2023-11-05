@@ -8,7 +8,7 @@ import os
 DB_CONNECTION = 'postgres_dev'
 # Source csv filename
 INPUT_FILE = "/data/src_data/src_distance.csv"
-
+CSV_SEPARATOR = ";"
 TARGET_TABLE = 'stg_distance'
 
 
@@ -24,14 +24,19 @@ TARGET_TABLE = 'stg_distance'
 )
 def etl_src_stg_distance_dag():
     # Function to read a CSV file
+    # Set null values for Desc_distance to "Non renseigné"
     @task
-    def read_csv_task(file_path):
-        df = pd.read_csv(file_path)
+    def read_csv_task(file_path, id, lib, sep=CSV_SEPARATOR):
+        df = pd.read_csv(file_path, sep=sep)
+        # Exclude rows with Id_Distance < 0
+        df = df[df[id] >= 0]
+        # Replace missing values (NaN) for Lib_Distance with "Non renseigné"
+        df[lib].fillna("Non renseigné", inplace=True)
         return df
 
     # Read the CSV file using the previous function
     csv_file_path = os.path.dirname(__file__) + INPUT_FILE
-    df_task = read_csv_task(csv_file_path)
+    df_task = read_csv_task(csv_file_path, 'Id_Distance', 'Lib_Distance')
 
     # Show the data read from CSV
     @task
