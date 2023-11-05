@@ -30,7 +30,7 @@ CSV_SEPARATOR = ";"  # Separator in the CSV file
     },
     tags=["example"],
 )
-def etl_src_stg_distance_dag():
+def etl_src_stg_direction_dag():
     # Function to read a CSV file
     # Set null values for Desc_distance to "Non renseigné"
     @task
@@ -39,7 +39,7 @@ def etl_src_stg_distance_dag():
         # Exclude rows with Id_Distance < 0
         df = df[df[id] >= 0]
         # Replace missing values (NaN) for Lib_Distance with "Non renseigné"
-        df[lib].fillna("Non renseigné", inplace=True)
+        # df[lib].fillna("Non renseigné", inplace=True)
         return df
 
     # Read the CSV file using the previous function
@@ -85,4 +85,4 @@ def etl_src_stg_distance_dag():
 
 
 # Create the DAG object
-stg_distance = etl_src_stg_distance_dag()
+stg_distance = etl_src_stg_direction_dag()
