@@ -6,12 +6,18 @@ from airflow.operators.python_operator import PythonOperator
 import pandas as pd
 import os
 from sqlalchemy import create_engine
-
-DB_CONNECTION = 'postgres_dev'
-# Source csv filename
-INPUT_FILE = "/data/src_data/src_distance.csv"
-CSV_SEPARATOR = ";"
-TARGET_TABLE = 'stg_distance'
+# For the function: copy_df_to_sql(dataframe)
+DB_HOST = "host.docker.internal"
+DB_NAME = "stg"
+DB_PORT = "5435"
+DB_USER = "postgres"
+DB_PASS = "postgres"
+# For PostgresOperator
+DB_CONNECTION = 'postgres_dev'  # Connextion to the DB
+TARGET_TABLE = 'stg_distance'  # Target table to store data trasformed
+# Source CSV file
+INPUT_FILE = "/data/src_data/src_distance.csv"  # File name
+CSV_SEPARATOR = ";"  # Separator in the CSV file
 
 
 @dag(
@@ -38,17 +44,19 @@ def etl_src_stg_distance_dag():
 
     # Read the CSV file using the previous function
     csv_file_path = os.path.dirname(__file__) + INPUT_FILE
-    csv_to_df_task = read_csv_task(csv_file_path, 'Id_Distance', 'Lib_Distance')
+    csv_to_df_task = read_csv_task(
+        csv_file_path, 'Id_Distance', 'Lib_Distance')
 
     # Show the data read from CSV
     @task
     def copy_df_to_sql(dataframe):
-        conn_string = 'postgresql://postgres:postgres@host.docker.internal:5435/stg'
+        conn_string = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
         engine = create_engine(conn_string)
-        dataframe.to_sql(TARGET_TABLE, engine, if_exists='replace', index=False)
+        dataframe.to_sql(TARGET_TABLE, engine,
+                         if_exists='replace', index=False)
 
     # Create variable to store the task
-    load_stg_distance = copy_df_to_sql (csv_to_df_task)
+    load_stg_distance = copy_df_to_sql(csv_to_df_task)
 
     # Create the SQL table
     create_sql_table_task = PostgresOperator(
@@ -75,6 +83,7 @@ def etl_src_stg_distance_dag():
 
     # Tasks order
     csv_to_df_task >> create_sql_table_task >> truncate_sql_table_task >> load_stg_distance
+
 
 # Create the DAG object
 stg_distance = etl_src_stg_distance_dag()
