@@ -56,7 +56,7 @@ def etl_src_stg_direction_dag():
                          if_exists='replace', index=False)
 
     # Create variable to store the task
-    load_stg_distance = copy_df_to_sql(csv_to_df_task)
+    load_stg_direction = copy_df_to_sql(csv_to_df_task)
 
     # Create the SQL table
     create_sql_table_task = PostgresOperator(
@@ -75,7 +75,7 @@ def etl_src_stg_direction_dag():
     )
 
     # Tasks order
-    csv_to_df_task >> create_sql_table_task >> truncate_sql_table_task >> load_stg_distance
+    csv_to_df_task >> create_sql_table_task >> truncate_sql_table_task >> load_stg_direction
 
 
 # Create the DAG object

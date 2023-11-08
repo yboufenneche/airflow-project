@@ -89,7 +89,7 @@ def etl_src_stg_client_dag():
                          if_exists='replace', index=False)
 
     # Create variable to store the task
-    load_stg_distance = copy_df_to_sql(csv_to_df_task)
+    load_stg_client = copy_df_to_sql(csv_to_df_task)
 
     # Create the SQL table
     # Task: <create_sql_table_task>
@@ -100,7 +100,7 @@ def etl_src_stg_client_dag():
     )
 
     # Tasks order
-    csv_to_df_task >> create_sql_table_task >> load_stg_distance
+    csv_to_df_task >> create_sql_table_task >> load_stg_client
 
 
 # Create the DAG object
