@@ -12,7 +12,7 @@ DB_HOST = "host.docker.internal"
 DB_NAME = "stg"
 DB_PORT = "5435"
 DB_USER = "postgres"
-DB_PASS = "postgres"
+DB_PASS = "postgres" # Use hook to store 
 
 # For PostgresOperator
 DB_CONNECTION = 'postgres_dev'  # Connextion to the DB
@@ -54,7 +54,7 @@ def etl_src_stg_distance_dag():
     @task
     def copy_df_to_sql(dataframe):
         conn_string = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-        engine = create_engine(conn_string)
+        engine = create_engine(conn_string) # CAN USE DbAPI hook - > methode: get_sql_alchemy_enfine()
         dataframe.to_sql(TARGET_TABLE, engine,
                          if_exists='replace', index=False)
 
