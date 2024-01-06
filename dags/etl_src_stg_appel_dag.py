@@ -79,6 +79,8 @@ def etl_src_stg_appel_dag():
         # Filter rows where distance id is not present in SQL table distance
         df = df[df[dis].isin(dis_df[dis])]
 
+        df[date] = pd.to_datetime(df[date], format="%d/%m/%Y").dt.strftime('%Y-%m-%d')
+
         # Replace missing call time with '12:00'
         df[heure].fillna("12/00", inplace=True)
 

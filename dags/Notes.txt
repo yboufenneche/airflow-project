@@ -1,0 +1,9 @@
+Use a hook to store db password.
+Access postgres shell in docker container:
+    docker exec -it <continer_id> -U postrgers -D database*
+
+
+1. Une seule task ?  La raison: latence pour déclencher les tasks. PotenProblèmes de RAM liés au return.
+2. Utiliser un chunk pour ingérer les jeus de données volumineux.
+3. Insertion Snowflake: PUT les données dans un stage Snowflake --> COPY les données vers les tables.
+4. Rejet de données: Great Expectation.

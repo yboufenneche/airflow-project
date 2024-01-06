@@ -1,7 +1,7 @@
-CREATE TABLE IF NOT EXISTS stg_direction (
-    Id_Direction NUMERIC(1),
-    Lib_Direction VARCHAR(15),
-    PRIMARY KEY (Id_Direction)
+CREATE OR REPLACE TABLE stg_direction (
+    "Id_Direction" NUMBER(2,0),
+    "Lib_Direction" VARCHAR(15),
+    CONSTRAINT SRC_DIRECTION_PK PRIMARY KEY ("Id_Direction")
 );
 
 TRUNCATE TABLE stg_direction;

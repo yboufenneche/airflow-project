@@ -1,3 +1,4 @@
+
 CREATE TABLE IF NOT EXISTS src_produit (
     Id_Produit INT,
     Lib_Produit VARCHAR(8),
