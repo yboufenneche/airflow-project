@@ -1,6 +1,6 @@
 Use a hook to store db password.
 Access postgres shell in docker container:
-    docker exec -it <continer_id> -U postrgers -D database*
+    docker exec -it <continer_id> -U postgres -D database
 
 
 1. Une seule task ?  La raison: latence pour déclencher les tasks. PotenProblèmes de RAM liés au return.

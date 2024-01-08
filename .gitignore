@@ -11,3 +11,4 @@ airflow.cfg
 airflow.db
 dags/data/rejected/
 venv/
+plugins/

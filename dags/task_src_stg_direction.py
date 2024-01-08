@@ -1,25 +1,34 @@
 from airflow.decorators import task, task_group
 
 from airflow.contrib.hooks.snowflake_hook import SnowflakeHook
+from airflow.hooks.postgres_hook import PostgresHook
 from sqlalchemy import create_engine
 
 import pandas as pd
 import os
 
-DB_CONNECTION = 'snowflake_dev'  # Connection to the DB
+SOURCE_DB_CONNECTION = 'postgres_dev'  # Connection to the source DB
+TARGET_DB_CONNECTION = 'snowflake_dev'  # Connection to the target DB
 SCHEMA = 'staging'
+SOURCE_TABLE = 'src_direction'  
 TARGET_TABLE = 'stg_direction'  # Target table to store data trasformed
 
-INPUT_FILE = "/data/src_data/src_direction.csv"  # Source CSV file name
+CSV_SEPARATOR = ';'
+
 REJECT_FILE = "/data/rejected/reject_stg_direction.csv"
-CSV_SEPARATOR = ";"  # Separator in the CSV files
 
 @task
 def src_to_stg_direction():
 
-    file_path = os.path.dirname(__file__) + INPUT_FILE
-    
-    df = pd.read_csv(file_path, sep=CSV_SEPARATOR)
+    hook = PostgresHook(postgres_conn_id=SOURCE_DB_CONNECTION)
+    connection = hook.get_conn()
+    connection_uri = hook.get_uri()
+    engine = create_engine(connection_uri)
+
+    # Load dataframe from source table
+    query = f"SELECT * FROM {SOURCE_TABLE}"
+    df = pd.read_sql(query, con=connection)
+    df = df.rename(columns={'id_direction': 'Id_Direction', 'lib_direction': 'Lib_Direction'})
 
     # Rejected data: rows with Id_Distance < 0
     rejected_df = df[df['Id_Direction'] < 0]
@@ -31,7 +40,7 @@ def src_to_stg_direction():
                         REJECT_FILE, sep=CSV_SEPARATOR, index=False)
 
     # Copy df to a Snowflake table
-    hook = SnowflakeHook(snowflake_conn_id=DB_CONNECTION)
+    hook = SnowflakeHook(snowflake_conn_id=TARGET_DB_CONNECTION)
     connection_uri = hook.get_uri()
     engine = create_engine(connection_uri)
     df.to_sql(TARGET_TABLE, engine, schema=SCHEMA, if_exists='append', index=False)
