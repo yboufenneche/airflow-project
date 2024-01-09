@@ -1,13 +1,6 @@
-from airflow.decorators import task, task_group
-
-from airflow.contrib.hooks.snowflake_hook import SnowflakeHook
 from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
-from sqlalchemy import create_engine
 
-import pandas as pd
-import os
-
-DB_CONNECTION = 'snowflake_dev'  # Connection to the DB
+DB_CONNECTION = 'snowflake_stg'  # Connection to the DB
 SOURCE_TABLE = 'SRC.source.src_produit'  # Source table
 TARGET_TABLE = 'STG.staging.stg_produit'  # Target table to store data trasformed
 
@@ -29,8 +22,8 @@ merge_query = f"""
 """
 
 # Merge task: exclude products with Id_Product <= 0 and replace null values by 'Inconnu'
-merge_produit = SnowflakeOperator(
-    task_id='elt_merge_product',
+merge_stg_produit = SnowflakeOperator(
+    task_id='src_to_stg_product',
     sql=merge_query,
     snowflake_conn_id=DB_CONNECTION,
     autocommit=True

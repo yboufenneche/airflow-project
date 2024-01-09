@@ -1,4 +1,4 @@
-from airflow.decorators import task, task_group
+from airflow.decorators import task
 
 from airflow.contrib.hooks.snowflake_hook import SnowflakeHook
 from sqlalchemy import create_engine
@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import os
 
-DB_CONNECTION = 'snowflake_dev'  # Connection to the DB
+DB_CONNECTION = 'snowflake_stg'  # Connection to the DB
 SCHEMA = 'staging'
 TARGET_TABLE = 'stg_distance'  # Target table to store data trasformed
 
@@ -36,4 +36,4 @@ def src_to_stg_distance():
     hook = SnowflakeHook(snowflake_conn_id=DB_CONNECTION)
     connection_uri = hook.get_uri()
     engine = create_engine(connection_uri)
-    df.to_sql(TARGET_TABLE, engine, schema=SCHEMA, if_exists='append', index=False)
+    df.to_sql(TARGET_TABLE, engine, schema=SCHEMA, if_exists='replace', index=False)
