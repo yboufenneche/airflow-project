@@ -25,8 +25,8 @@ engine = create_engine(connection_uri)
 
 @task
 def src_to_stg_appel():
-    
-    file_path = os.path.dirname(__file__) + INPUT_FILE
+
+    file_path = os.path.dirname(os.path.dirname(__file__)) + INPUT_FILE
 
     # Load CSV data to a DataFrame
     df = pd.read_csv(file_path, sep=CSV_SEPARATOR)
@@ -42,25 +42,28 @@ def src_to_stg_appel():
 
     # Load data from SQL table distance into a DataFrame
     dis_df = pd.read_sql_table(JOIN_TABLE_DISTANCE, engine)
-    
+
     # Reject data
     df_reject_null = df[df['Id_Client'].isna() | (df['Date_appel'].isna()) | (
         df['Id_Direction'].isna()) | (df['Id_Distance'].isna())]
     df_reject_cli = df[~df['Id_Client'].isin(client_df['Id_Client'])]
     df_reject_dir = df[~df['Id_Direction'].isin(dir_df['Id_Direction'])]
-    df_reject_prod = df[(df['Id_Produit'].notna()) & ~df['Id_Produit'].isin(prod_df['Id_Produit'])]
+    df_reject_prod = df[(df['Id_Produit'].notna()) & ~
+                        df['Id_Produit'].isin(prod_df['Id_Produit'])]
     df_reject_dis = df[~df['Id_Distance'].isin(dis_df['Id_Distance'])]
-    
-    df['Date_appel'] = pd.to_datetime(df['Date_appel'], format="%d/%m/%Y").dt.strftime('%Y-%m-%d')
-    
+
+    df['Date_appel'] = pd.to_datetime(
+        df['Date_appel'], format="%d/%m/%Y").dt.strftime('%Y-%m-%d')
+
     # Conctenate all rejected dataframes
-    reject_frames = [df_reject_null, df_reject_cli, df_reject_dir, df_reject_prod, df_reject_dis]
+    reject_frames = [df_reject_null, df_reject_cli,
+                     df_reject_dir, df_reject_prod, df_reject_dis]
     rejected_df = pd.concat(reject_frames).drop_duplicates()
 
     # Filter rows with missing client id, call date, direction id, or distance id
     df = df[df['Id_Client'].notna() & (df['Date_appel'].notna()) & (
         df['Id_Direction'].notna()) & (df['Id_Distance'].notna())]
-    
+
     # Filter rows where client id is not present in SQL table client
     df = df[df['Id_Client'].isin(client_df['Id_Client'])]
 
@@ -68,7 +71,8 @@ def src_to_stg_appel():
     df = df[df['Id_Direction'].isin(dir_df['Id_Direction'])]
 
     # Filter rows where product id is set but not present in SQL table produit
-    df = df[(df['Id_Produit'].isna()) | df['Id_Produit'].isin(prod_df['Id_Produit'])]
+    df = df[(df['Id_Produit'].isna()) |
+            df['Id_Produit'].isin(prod_df['Id_Produit'])]
 
     # Filter rows where distance id is not present in SQL table distance
     df = df[df['Id_Distance'].isin(dis_df['Id_Distance'])]
@@ -89,8 +93,9 @@ def src_to_stg_appel():
                 f"Alerte : Le numéro {row['No_appele']} n'est pas au format attendu.")
 
     # Save rejected data to a CSV file
-    rejected_df.to_csv(os.path.dirname(__file__) +
-                        REJECT_FILE, sep=CSV_SEPARATOR, index=False)
+    rejected_df.to_csv(os.path.dirname(os.path.dirname(__file__)) +
+                       REJECT_FILE, sep=CSV_SEPARATOR, index=False)
 
     # Copy df to a Snowflake table
-    df.to_sql(TARGET_TABLE, engine, schema=SCHEMA, if_exists='append', index=False)
+    df.to_sql(TARGET_TABLE, engine, schema=SCHEMA,
+              if_exists='append', index=False)

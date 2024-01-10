@@ -38,11 +38,12 @@ def src_to_stg_direction():
     df = df[df['Id_Direction'] >= 0]  # Exclude rows with Id_Direction < 0
 
     # Save rejected data to a CSV file
-    rejected_df.to_csv(os.path.dirname(__file__) +
+    rejected_df.to_csv(os.path.dirname(os.path.dirname(__file__)) +
                        REJECT_FILE, sep=CSV_SEPARATOR, index=False)
 
     # Copy df to a Snowflake table
     hook = SnowflakeHook(snowflake_conn_id=TARGET_DB_CONNECTION)
     connection_uri = hook.get_uri()
     engine = create_engine(connection_uri)
-    df.to_sql(TARGET_TABLE, engine, schema=SCHEMA, if_exists='replace', index=False)
+    df.to_sql(TARGET_TABLE, engine, schema=SCHEMA,
+              if_exists='replace', index=False)

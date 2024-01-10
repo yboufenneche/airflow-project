@@ -24,7 +24,7 @@ engine = create_engine(connection_uri)
 @task
 def src_to_stg_client():
 
-    file_path = os.path.dirname(__file__) + INPUT_FILE
+    file_path = os.path.dirname(os.path.dirname(__file__)) + INPUT_FILE
 
     # Load CSV data to a DataFrame
     df = pd.read_csv(file_path, sep=CSV_SEPARATOR)

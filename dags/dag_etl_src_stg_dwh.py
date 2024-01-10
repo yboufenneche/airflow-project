@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from airflow.decorators import dag
-from task_src_stg_distance import src_to_stg_distance
-from task_src_stg_direction import src_to_stg_direction
-from task_src_stg_offre import src_to_stg_offre
-from task_src_stg_client import src_to_stg_client
-from task_src_stg_produit import merge_stg_produit
-from task_src_stg_appel import src_to_stg_appel
-from task_stg_dwh_direction import copy_dwh_direction
-from task_stg_dwh_distance import copy_dwh_distance
+from jobs_src_stg.task_src_stg_distance import src_to_stg_distance
+from jobs_src_stg.task_src_stg_direction import src_to_stg_direction
+from jobs_src_stg.task_src_stg_offre import src_to_stg_offre
+from jobs_src_stg.task_src_stg_client import src_to_stg_client
+from jobs_src_stg.task_src_stg_produit import merge_stg_produit
+from jobs_src_stg.task_src_stg_appel import src_to_stg_appel
+from jobs_stg_dwh.task_stg_dwh_direction import copy_dwh_direction
+from jobs_stg_dwh.task_stg_dwh_distance import copy_dwh_distance
 
 # The dag
 @dag(
