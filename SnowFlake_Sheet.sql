@@ -1,6 +1,10 @@
 USE WAREHOUSE COMPUTE_WH;
 
+---
 --- User Defined Functions
+---
+
+--- Function pays(): extract the country based on distanc ID, calling number, and called number
 
 CREATE OR REPLACE FUNCTION pays(id_disantce int, no_appelant string, no_appele string)
 returns string
@@ -39,7 +43,7 @@ CREATE DATABASE stg;
 CREATE DATABASE dwh;
 
 ---
---- Source database
+--- DDL source database
 ---
 
 USE DATABASE src;
@@ -53,35 +57,10 @@ CREATE OR REPLACE TABLE SRC.SOURCE.src_produit (
     CONSTRAINT SRC_PRODUIT_PK PRIMARY KEY ("Id_Produit")
 );
 
-
-INSERT INTO
-    src_produit ("Id_Produit", "Lib_Produit", "Desc_Produit")
-VALUES
-    (1, 'Voix', 'Appel vocal');
-
-INSERT INTO
-    src_produit ("Id_Produit", "Lib_Produit", "Desc_Produit")
-VALUES
-    (2, 'SMS', 'Message SMS');
-
-INSERT INTO
-    src_produit ("Id_Produit", "Lib_Produit", "Desc_Produit")
-VALUES
-    (3, 'Fax', 'Envoi vers fax');
-
-INSERT INTO
-    src_produit ("Id_Produit", "Lib_Produit", "Desc_Produit")
-VALUES
-    (0, 'Unknown', '???');
-    
-
-
-SELECT * FROM src_produit;
-TRUNCATE TABLE src_produit;
-
 ---
---- Staging database
+--- DDL staging database
 ---
+
 USE DATABASE stg;
 CREATE SCHEMA staging;
 
@@ -136,22 +115,8 @@ CREATE OR REPLACE TABLE STG.STAGING.STG_APPEL (
     CONSTRAINT STG_APPEL_PK PRIMARY KEY ("Date_appel", "Heure_appel")
 );
 
-SELECT * FROM STG.STAGING.stg_offre;
-SELECT * FROM STG.STAGING.stg_distance;
-SELECT * FROM STG.STAGING.stg_direction;
-SELECT * FROM STG.STAGING.stg_client;
-SELECT * FROM STG.STAGING.stg_produit;
-SELECT * FROM STG.STAGING.stg_appel;
-
-TRUNCATE TABLE STG.STAGING.stg_offre;
-TRUNCATE TABLE STG.STAGING.stg_distance;
-TRUNCATE TABLE STG.STAGING.stg_direction;
-TRUNCATE TABLE STG.STAGING.stg_client;
-TRUNCATE TABLE STG.STAGING.stg_produit;
-TRUNCATE TABLE STG.STAGING.stg_appel;
-
 ---
---- Normalized database
+--- DDL normalized database
 ---
 
 USE DATABASE DWH;
@@ -200,7 +165,6 @@ CREATE OR REPLACE TABLE DWH.NORMALIZED.DWH_CLIENT (
      CONSTRAINT DWH_DIRECTION_PK PRIMARY KEY ("Id_Client")
 );
 
-
 CREATE OR REPLACE TABLE DWH.NORMALIZED.DWH_APPEL (
     "Id_Client"	NUMBER(10,0),
     "Date_appel"	DATE,
@@ -244,6 +208,42 @@ CREATE OR REPLACE TABLE DWH.NORMALIZED.DWH_AGG_APPEL_DISTANCE (
     Constraint DWH_AGG_APPEL_DISTANCE_PK Primary key ("Lib_Distance", "Pays", "Mois_appel", "Type_Offre", "Id_Direction", "Lib_Produit")
 );
 
+---
+--- Insert data to SRC database
+---
+
+INSERT INTO
+    SRC.SOURCE.src_produit ("Id_Produit", "Lib_Produit", "Desc_Produit")
+VALUES
+    (1, 'Voix', 'Appel vocal');
+
+INSERT INTO
+    SRC.SOURCE.src_produit ("Id_Produit", "Lib_Produit", "Desc_Produit")
+VALUES
+    (2, 'SMS', 'Message SMS');
+
+INSERT INTO
+    SRC.SOURCE.src_produit ("Id_Produit", "Lib_Produit", "Desc_Produit")
+VALUES
+    (3, 'Fax', 'Envoi vers fax');
+
+INSERT INTO
+    SRC.SOURCE.src_produit ("Id_Produit", "Lib_Produit", "Desc_Produit")
+VALUES
+    (0, 'Unknown', '???');
+
+---
+--- Select data
+----
+
+SELECT * FROM SRC.SOURCE.src_produit
+
+SELECT * FROM STG.STAGING.stg_offre;
+SELECT * FROM STG.STAGING.stg_distance;
+SELECT * FROM STG.STAGING.stg_direction;
+SELECT * FROM STG.STAGING.stg_client;
+SELECT * FROM STG.STAGING.stg_produit;
+SELECT * FROM STG.STAGING.stg_appel;
 
 SELECT * FROM DWH.NORMALIZED.DWH_DIRECTION;
 SELECT * FROM DWH.NORMALIZED.DWH_DISTANCE;
@@ -253,6 +253,17 @@ SELECT * FROM DWH.NORMALIZED.DWH_CLIENT;
 SELECT * FROM DWH.NORMALIZED.DWH_APPEL;
 SELECT * FROM DWH.NORMALIZED.DWH_AGG_APPEL_PRD;
 SELECT * FROM DWH.NORMALIZED.DWH_AGG_APPEL_DISTANCE;
+
+---
+--- Truncate data 
+---
+
+TRUNCATE TABLE STG.STAGING.stg_offre;
+TRUNCATE TABLE STG.STAGING.stg_distance;
+TRUNCATE TABLE STG.STAGING.stg_direction;
+TRUNCATE TABLE STG.STAGING.stg_client;
+TRUNCATE TABLE STG.STAGING.stg_produit;
+TRUNCATE TABLE STG.STAGING.stg_appel;
 
 TRUNCATE TABLE DWH.NORMALIZED.DWH_DIRECTION;
 TRUNCATE TABLE DWH.NORMALIZED.DWH_DISTANCE;
