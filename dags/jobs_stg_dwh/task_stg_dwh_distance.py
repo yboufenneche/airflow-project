@@ -8,6 +8,7 @@ TARGET_TABLE = 'DWH.normalized.dwh_distance' # Target table to store data trasfo
 # MERGE
 merge_query = f"""
     TRUNCATE TABLE {TARGET_TABLE};
+    
     MERGE INTO {TARGET_TABLE} AS target
     USING {SOURCE_TABLE} AS source
     ON target."Id_Distance" = source."Id_Distance"

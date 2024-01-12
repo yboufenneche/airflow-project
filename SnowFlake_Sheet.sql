@@ -1,4 +1,39 @@
 USE WAREHOUSE COMPUTE_WH;
+
+--- User Defined Functions
+
+CREATE OR REPLACE FUNCTION pays(id_disantce int, no_appelant string, no_appele string)
+returns string
+language python
+runtime_version = '3.10'
+handler = 'pays_py'
+AS
+$$
+def pays_py(id_distance, no_appelant, no_appele):
+    if (id_distance != 5):
+        return 'France'
+    if (no_appelant.startswith("30") or no_appele.startswith("30")):
+        return "Grèce"
+    if (no_appelant.startswith("33") or no_appele.startswith("33")):
+        return "Fracne"
+    if (no_appelant.startswith("352") or no_appele.startswith("352")):
+        return "Luxembourg"
+    if (no_appelant.startswith("377") or no_appele.startswith("377")):
+        return "Monaco"
+    if (no_appelant.startswith("41") or no_appele.startswith("41")):
+        return "Suisse"
+    if (no_appelant.startswith("44") or no_appele.startswith("44")):
+        return "Royaume Uni"
+    if (no_appelant.startswith("45") or no_appele.startswith("45")):
+        return "Danemark"
+    if (no_appelant.startswith("49") or no_appele.startswith("49")):
+        return "Allemagne"
+
+    return "Autre"
+$$; 
+
+--- Create databases
+
 CREATE DATABASE src;
 CREATE DATABASE stg;
 CREATE DATABASE dwh;
@@ -11,7 +46,7 @@ USE DATABASE src;
 CREATE SCHEMA source;
 USE SCHEMA source;
 
-CREATE OR REPLACE TABLE src_produit (
+CREATE OR REPLACE TABLE SRC.SOURCE.src_produit (
     "Id_Produit" NUMBER(3,0),
     "Lib_Produit" VARCHAR(8),
     "Desc_Produit" VARCHAR(20),
@@ -39,17 +74,16 @@ INSERT INTO
 VALUES
     (0, 'Unknown', '???');
     
-USE DATABASE SRC;
-USE SCHEMA source;
-select * from src_produit;
-truncate table src_produit;
+
+
+SELECT * FROM src_produit;
+TRUNCATE TABLE src_produit;
 
 ---
 --- Staging database
 ---
 USE DATABASE stg;
 CREATE SCHEMA staging;
-USE SCHEMA staging;
 
 CREATE OR REPLACE TABLE STG.STAGING.STG_OFFRE (
 	"Id_Offre" NUMBER(3,0),
@@ -102,22 +136,19 @@ CREATE OR REPLACE TABLE STG.STAGING.STG_APPEL (
     CONSTRAINT STG_APPEL_PK PRIMARY KEY ("Date_appel", "Heure_appel")
 );
 
-USE DATABASE stg;
-USE SCHEMA staging;
+SELECT * FROM STG.STAGING.stg_offre;
+SELECT * FROM STG.STAGING.stg_distance;
+SELECT * FROM STG.STAGING.stg_direction;
+SELECT * FROM STG.STAGING.stg_client;
+SELECT * FROM STG.STAGING.stg_produit;
+SELECT * FROM STG.STAGING.stg_appel;
 
-SELECT * FROM stg_offre;
-SELECT * FROM stg_distance;
-SELECT * FROM stg_direction;
-SELECT * FROM stg_client;
-SELECT * FROM stg_produit;
-SELECT * FROM stg_appel;
-
-TRUNCATE TABLE stg_offre;
-TRUNCATE TABLE stg_distance;
-TRUNCATE TABLE stg_direction;
-TRUNCATE TABLE stg_client;
-TRUNCATE TABLE stg_produit;
-TRUNCATE TABLE stg_appel;
+TRUNCATE TABLE STG.STAGING.stg_offre;
+TRUNCATE TABLE STG.STAGING.stg_distance;
+TRUNCATE TABLE STG.STAGING.stg_direction;
+TRUNCATE TABLE STG.STAGING.stg_client;
+TRUNCATE TABLE STG.STAGING.stg_produit;
+TRUNCATE TABLE STG.STAGING.stg_appel;
 
 ---
 --- Normalized database
@@ -213,11 +244,21 @@ CREATE OR REPLACE TABLE DWH.NORMALIZED.DWH_AGG_APPEL_DISTANCE (
     Constraint DWH_AGG_APPEL_DISTANCE_PK Primary key ("Lib_Distance", "Pays", "Mois_appel", "Type_Offre", "Id_Direction", "Lib_Produit")
 );
 
-USE DATABASE dwh;
-USE SCHEMA normalized;
 
-SELECT * FROM DWH_DIRECTION;
-SELECT * FROM DWH_DISTANCE;
+SELECT * FROM DWH.NORMALIZED.DWH_DIRECTION;
+SELECT * FROM DWH.NORMALIZED.DWH_DISTANCE;
+SELECT * FROM DWH.NORMALIZED.DWH_PRODUIT;
+SELECT * FROM DWH.NORMALIZED.DWH_OFFRE;
+SELECT * FROM DWH.NORMALIZED.DWH_CLIENT;
+SELECT * FROM DWH.NORMALIZED.DWH_APPEL;
+SELECT * FROM DWH.NORMALIZED.DWH_AGG_APPEL_PRD;
+SELECT * FROM DWH.NORMALIZED.DWH_AGG_APPEL_DISTANCE;
 
-TRUNCATE TABLE DWH_DIRECTION;
-TRUNCATE TABLE DWH_DISTANCE;
+TRUNCATE TABLE DWH.NORMALIZED.DWH_DIRECTION;
+TRUNCATE TABLE DWH.NORMALIZED.DWH_DISTANCE;
+TRUNCATE TABLE DWH.NORMALIZED.DWH_PRODUIT;
+TRUNCATE TABLE DWH.NORMALIZED.DWH_OFFRE;
+TRUNCATE TABLE DWH.NORMALIZED.DWH_CLIENT;
+TRUNCATE TABLE DWH.NORMALIZED.DWH_APPEL;
+TRUNCATE TABLE DWH.NORMALIZED.DWH_AGG_APPEL_PRD;
+TRUNCATE TABLE DWH.NORMALIZED.DWH_AGG_APPEL_DISTANCE;

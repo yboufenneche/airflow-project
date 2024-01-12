@@ -10,6 +10,10 @@ from jobs_stg_dwh.task_stg_dwh_direction import copy_dwh_direction
 from jobs_stg_dwh.task_stg_dwh_produit import copy_dwh_produit
 from jobs_stg_dwh.task_stg_dwh_distance import merge_dwh_distance
 from jobs_stg_dwh.task_stg_dwh_offre import merge_dwh_offre
+from jobs_stg_dwh.task_stg_dwh_client import merge_dwh_client
+from jobs_stg_dwh.task_stg_dwh_appel import merge_dwh_appel
+from jobs_stg_dwh.task_dwh_agg_appel_prd import merge_dwh_agg_appel_prd
+from jobs_stg_dwh.task_dwh_agg_appel_distance import merge_dwh_agg_appel_distance
 
 # The dag
 
@@ -25,8 +29,8 @@ from jobs_stg_dwh.task_stg_dwh_offre import merge_dwh_offre
     tags=["src", "stg", "dwh", "etl"],
 )
 def dag_etl_src_stg_dwh():
-    src_to_stg_offre() >> src_to_stg_distance() >> src_to_stg_direction() >> src_to_stg_client(
-    ) >> merge_stg_produit >> src_to_stg_appel() >> copy_dwh_direction >> copy_dwh_produit >> merge_dwh_distance >> merge_dwh_offre
+    src_to_stg_offre() >> src_to_stg_distance() >> src_to_stg_direction() >> src_to_stg_client() >> merge_stg_produit >> src_to_stg_appel(
+    ) >> copy_dwh_direction >> copy_dwh_produit >> merge_dwh_distance >> merge_dwh_offre >> merge_dwh_client >> merge_dwh_appel >> merge_dwh_agg_appel_prd >> merge_dwh_agg_appel_distance
 
 
 my_dag = dag_etl_src_stg_dwh()

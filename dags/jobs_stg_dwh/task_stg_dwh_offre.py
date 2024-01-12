@@ -8,6 +8,7 @@ TARGET_TABLE = 'DWH.normalized.dwh_offre' # Target table to store data trasforme
 # MERGE
 merge_query = f"""
     TRUNCATE TABLE {TARGET_TABLE};
+    
     MERGE INTO {TARGET_TABLE} AS target
     USING {SOURCE_TABLE} AS source
     ON target."Id_Offre" = source."Id_Offre"
