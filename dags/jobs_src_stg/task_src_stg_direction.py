@@ -15,6 +15,8 @@ TARGET_TABLE = 'stg_direction'  # Target table to store data trasformed
 
 CSV_SEPARATOR = ';'
 
+DF_CHUNK_SIZE = 20000 # chunksize value for the Pandas to_sql() method
+
 REJECT_FILE = "/data/rejected/reject_stg_direction.csv"
 
 
@@ -46,4 +48,4 @@ def src_to_stg_direction():
     connection_uri = hook.get_uri()
     engine = create_engine(connection_uri)
     df.to_sql(TARGET_TABLE, engine, schema=SCHEMA,
-              if_exists='replace', index=False)
+              if_exists='replace', index=False, chunksize=DF_CHUNK_SIZE)

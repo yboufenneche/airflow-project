@@ -14,6 +14,8 @@ INPUT_FILE = "/data/src_data/src_offre.csv"  # Source CSV file name
 REJECT_FILE = "/data/rejected/reject_stg_offre.csv"
 CSV_SEPARATOR = ";"  # Separator in the CSV files
 
+DF_CHUNK_SIZE = 20000 # chunksize value for the Pandas to_sql() method
+
 
 @task
 def src_to_stg_offre():
@@ -40,7 +42,7 @@ def src_to_stg_offre():
 
     # Save rejected data to a CSV file
     rejected_df.to_csv(os.path.dirname(os.path.dirname(__file__)) +
-                       REJECT_FILE, sep=CSV_SEPARATOR, index=False)
+                       REJECT_FILE, sep=CSV_SEPARATOR, index=False, chunksize=DF_CHUNK_SIZE)
 
     # Copy df to a Snowflake table
     hook = SnowflakeHook(snowflake_conn_id=DB_CONNECTION)

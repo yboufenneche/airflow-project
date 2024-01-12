@@ -14,6 +14,7 @@ INPUT_FILE = "/data/src_data/src_distance.csv"  # Source CSV file name
 REJECT_FILE = "/data/rejected/reject_stg_distance.csv"
 CSV_SEPARATOR = ";"  # Separator in the CSV files
 
+DF_CHUNK_SIZE = 20000 # chunksize value for the Pandas to_sql() method
 
 @task
 def src_to_stg_distance():
@@ -38,4 +39,4 @@ def src_to_stg_distance():
     connection_uri = hook.get_uri()
     engine = create_engine(connection_uri)
     df.to_sql(TARGET_TABLE, engine, schema=SCHEMA,
-              if_exists='replace', index=False)
+              if_exists='replace', index=False, chunksize=DF_CHUNK_SIZE)

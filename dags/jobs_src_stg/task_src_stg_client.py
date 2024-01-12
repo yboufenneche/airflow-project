@@ -20,6 +20,7 @@ hook = SnowflakeHook(snowflake_conn_id=DB_CONNECTION)
 connection_uri = hook.get_uri()
 engine = create_engine(connection_uri)
 
+DF_CHUNK_SIZE = 20000 # chunksize value for the Pandas to_sql() method
 
 @task
 def src_to_stg_client():
@@ -58,4 +59,4 @@ def src_to_stg_client():
 
     # Copy df to a Snowflake table
     df.to_sql(TARGET_TABLE, engine, schema=SCHEMA,
-              if_exists='append', index=False)
+              if_exists='append', index=False, chunksize=DF_CHUNK_SIZE)
