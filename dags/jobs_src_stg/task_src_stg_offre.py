@@ -20,7 +20,6 @@ DF_CHUNK_SIZE = 20000 # chunksize value for the Pandas to_sql() method
 @task
 def src_to_stg_offre():
 
-    # file_path = os.path.dirname(os.getcwd()) + INPUT_FILE
     file_path = os.path.dirname(os.path.dirname(__file__)) + INPUT_FILE
 
     df = pd.read_csv(file_path, sep=CSV_SEPARATOR)

@@ -19,16 +19,15 @@ DF_CHUNK_SIZE = 20000 # chunksize value for the Pandas to_sql() method
 @task
 def src_to_stg_distance():
 
-    file_path = os.path.dirname(os.path.dirname(__file__)) + INPUT_FILE
+    file_path = os.path.dirname(os.path.dirname(__file__)) + INPUT_FILE # Full path to source data (csv)
 
-    df = pd.read_csv(file_path, sep=CSV_SEPARATOR)
+    df = pd.read_csv(file_path, sep=CSV_SEPARATOR) # Create a Pandas dataframe using the content of the source csv
 
-    # Rejected data: rows with Id_Distance < 0
-    rejected_df = df[df['Id_Distance'] < 0]
+    rejected_df = df[df['Id_Distance'] < 0] # Rejected data: rows with Id_Distance < 0
+
     df = df[df['Id_Distance'] >= 0]  # Exclude rows with Id_Distance < 0
 
-    # Replace missing Lib_Distance with "Non renseigné"
-    df['Lib_Distance'].fillna("Non renseigné", inplace=True)
+    df['Lib_Distance'].fillna("Non renseigné", inplace=True) # Replace missing Lib_Distance with "Non renseigné"
 
     # Save rejected data to a CSV file
     rejected_df.to_csv(os.path.dirname(os.path.dirname(__file__)) +

@@ -7,3 +7,5 @@ Access postgres shell in docker container:
 2. Utiliser un chunk pour ingérer les jeus de données volumineux.
 3. Insertion Snowflake: PUT les données dans un stage Snowflake --> COPY les données vers les tables.
 4. Rejet de données: Great Expectation.
+
+5. Utiliser une table de trascodage pour le "Pays"

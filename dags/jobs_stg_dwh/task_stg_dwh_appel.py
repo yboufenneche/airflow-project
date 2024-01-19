@@ -10,6 +10,7 @@ JOIN_PRD = 'DWH.normalized.dwh_produit'
 JOIN_DIS = 'DWH.normalized.dwh_distance'
 
 # MERGE
+# Pour une melleiure expérience on peut utiliser une table de transcodage
 merge_query = f"""
     CREATE OR REPLACE FUNCTION pays(id_disantce int, no_appelant string, no_appele string)
     returns string
