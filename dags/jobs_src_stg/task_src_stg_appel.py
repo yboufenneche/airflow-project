@@ -114,6 +114,7 @@ def src_to_stg_appel():
     snowflake_table_stage = f"@%{TARGET_TABLE}"
 
     # PUT_COPY
+    # ATTENTION: File format (CSV) should be created in Snowflake.
     put_copy_query = f"""
         USE DATABASE {DATABASE};
         USE SCHEMA {SCHEMA};
